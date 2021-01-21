@@ -1,8 +1,14 @@
 {
   "vocab_size": 200,
-  "class_num": 2,
+  "class_num": 3,
   "embed_size": 128,
   "kernel_num": 100,
   "kernel_sizes": [2, 3, 4],
-  "dropout_rate": 0.5
+  "dropout_rate": 0.5,
+  "batch_size": 128,
+  "lr": 0.01,
+  "epochs": 10,
+  "early_stopping": 160,
+  "display_interval": 5,
+  "val_interval": 30
 }
