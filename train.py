@@ -3,9 +3,10 @@
 # @Author  : kaka
 
 import os
+import json
+import pickle
 import torch
 import torch.nn.functional as F
-import json
 from model.textcnn import TextCNN
 import dataset
 
@@ -19,7 +20,6 @@ def train_model(train_iter, val_iter, model, args):
     for epoch in range(1, args['epochs'] + 1):
         for batch in train_iter:
             feature, target = batch.text, batch.label
-            # feature = feature.data.t_()
             feature = feature.transpose(0, 1)
             optimizer.zero_grad()
             logits = model(feature)
@@ -41,7 +41,7 @@ def train_model(train_iter, val_iter, model, args):
                     best_acc = val_acc
                     best_step = step_idx
                     print('Saving best model, acc: {:.4f}%\n'.format(best_acc))
-                    save(model, './', best_acc, step_idx)
+                    save_model(model, './', best_acc, step_idx)
                 else:
                     if step_idx - best_step >= args['early_stopping']:
                         print('early stop by {} steps, acc: {:.4f}%'.format(args['early_stopping'], best_acc))
@@ -69,7 +69,12 @@ def eval_model(data_iter, model, args):
     return accuracy
 
 
-def save(model, save_dir, acc, step):
+def save_vocab(vocab, fname):
+    with open(fname, 'wb') as h:
+        pickle.dump(vocab, h)
+
+
+def save_model(model, save_dir, acc, step):
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
     save_path = '{0}/step{1}_acc{2:.4f}.pt'.format(save_dir, step, acc)
@@ -82,7 +87,10 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     train_iter, val_iter, test_iter = dataset.get_data('./data', batch_size=args['batch_size'], device=device)
 
-    vocab_size = len(train_iter.dataset.fields['text'].vocab.stoi)
+    vocab = train_iter.dataset.fields['text'].vocab
+    save_vocab(vocab, './vocab.pkl')
+
+    vocab_size = len(vocab.stoi)
     model = TextCNN(
         vocab_size=vocab_size,
         class_num=args['class_num'],
