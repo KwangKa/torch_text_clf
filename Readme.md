@@ -3,12 +3,14 @@
 </h3>
 
 ### support models
+---
 
 - [x] TextCNN
 - [ ] TextRNN
 - [ ] HAN
 
 ### usage
+---
 
 ```python
 # train model
@@ -19,6 +21,8 @@ python predict.py
 ```
 
 ### deps
+---
+
 | package | version |
 |--- | --- |
 | python | 3.7 |
