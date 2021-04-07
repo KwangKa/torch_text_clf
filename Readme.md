@@ -1,17 +1,19 @@
+![](https://img.shields.io/badge/license-MIT-blue)
+![](https://img.shields.io/badge/python-3.7-green)
+![](https://img.shields.io/badge/torch-1.7.1-green)
+
 <h3 align="center">
 <p>A PyTorch implementation of neural classififers for Chinese
 </h3>
 
-### support models
----
-
+### 1. 已实现模型
 - [x] TextCNN
 - [ ] TextRNN
 - [ ] HAN
 
-### usage
 ---
 
+### 2. 用法
 ```python
 # train model
 python train.py
@@ -20,8 +22,9 @@ python train.py
 python predict.py
 ```
 
-### deps
 ---
+
+### 3. 依赖
 
 | package | version |
 |--- | --- |
