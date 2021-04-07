@@ -16,11 +16,10 @@ def train_model(train_iter, val_iter, model, args):
     step_idx = 0
     best_acc = 0
     best_step = 0
-    model.train()
     for epoch in range(1, args['epochs'] + 1):
         for batch in train_iter:
-            feature, target = batch.text, batch.label
-            feature = feature.transpose(0, 1)
+            model.train()
+            feature, target = batch[0], batch[1]
             optimizer.zero_grad()
             logits = model(feature)
             loss = F.cross_entropy(logits, target)
@@ -29,14 +28,15 @@ def train_model(train_iter, val_iter, model, args):
             step_idx += 1
             if step_idx % args['display_interval'] == 0:
                 corrects = (torch.max(logits, 1)[1].view(target.size()).data == target.data).sum()
-                train_acc = 100.0 * corrects / batch.batch_size
+                b_size = len(target)
+                train_acc = 100.0 * corrects / b_size
                 print('Batch[{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(step_idx,
                                                                              loss.item(),
                                                                              train_acc,
                                                                              corrects,
-                                                                             batch.batch_size))
+                                                                             b_size))
             if step_idx % args['val_interval'] == 0:
-                val_acc = eval_model(val_iter, model, args)
+                val_acc = eval_model(val_iter, model)
                 if val_acc > best_acc:
                     best_acc = val_acc
                     best_step = step_idx
@@ -48,17 +48,16 @@ def train_model(train_iter, val_iter, model, args):
                         raise KeyboardInterrupt
 
 
-def eval_model(data_iter, model, args):
+def eval_model(data_iter, model):
     model.eval()
     corrects, avg_loss = 0, 0
-    for batch in data_iter:
-        feature, target = batch.text, batch.label
-        # feature.data.t_()
-        feature = feature.transpose(0, 1)
-        logits = model(feature)
-        loss = F.cross_entropy(logits, target)
-        avg_loss += loss.item()
-        corrects += (torch.max(logits, 1)[1].view(target.size()).data == target.data).sum()
+    with torch.no_grad():
+        for batch in data_iter:
+            feature, target = batch[0], batch[1]
+            logits = model(feature)
+            loss = F.cross_entropy(logits, target)
+            avg_loss += loss.item()
+            corrects += (torch.max(logits, 1)[1].view(target.size()).data == target.data).sum()
     size = len(data_iter.dataset)
     avg_loss /= size
     accuracy = 100.0 * corrects / size
@@ -84,13 +83,9 @@ def save_model(model, save_dir, acc, step):
 def main():
     with open('./conf/textcnn_conf.json', 'r') as h_in:
         args = json.load(h_in)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    train_iter, val_iter, test_iter = dataset.get_data('./data', batch_size=args['batch_size'], device=device)
-
-    vocab = train_iter.dataset.fields['text'].vocab
+    train_iter, val_iter, test_iter, vocab = dataset.get_data('./data', batch_size=args['batch_size'])
     save_vocab(vocab, './vocab.pkl')
-
-    vocab_size = len(vocab.stoi)
+    vocab_size = len(vocab)
     model = TextCNN(
         vocab_size=vocab_size,
         class_num=args['class_num'],
