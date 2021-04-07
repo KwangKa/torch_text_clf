@@ -59,7 +59,6 @@ def get_data(path, batch_size):
 
     tokenizer = Tokenizer()
     vocab = build_vocab([f_train, f_test, f_val], tokenizer=tokenizer.tokenize, min_freq=2, max_size=50000)
-    print('vocab size:{0}'.format(len(vocab)))
 
     train_ds = ClassificationDataset(fname=f_train, tokenizer=tokenizer.tokenize, vocab=vocab)
     test_ds = ClassificationDataset(fname=f_test, tokenizer=tokenizer.tokenize, vocab=vocab)

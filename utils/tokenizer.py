@@ -2,7 +2,9 @@
 # @Time    : 2021/4/7 16:01
 # @Author  : kaka
 
+import logging
 import jieba
+jieba.setLogLevel(logging.INFO)
 
 
 class Tokenizer(object):

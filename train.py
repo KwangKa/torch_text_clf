@@ -30,17 +30,21 @@ def train_model(train_iter, val_iter, model, args):
                 corrects = (torch.max(logits, 1)[1].view(target.size()).data == target.data).sum()
                 b_size = len(target)
                 train_acc = 100.0 * corrects / b_size
-                print('Batch[{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(step_idx,
-                                                                             loss.item(),
-                                                                             train_acc,
-                                                                             corrects,
-                                                                             b_size))
+                print('Batch[{}] - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(
+                    step_idx,
+                    loss.item(),
+                    train_acc,
+                    corrects,
+                    b_size),
+                    end='\r',
+                    flush=True
+                )
             if step_idx % args['val_interval'] == 0:
                 val_acc = eval_model(val_iter, model)
                 if val_acc > best_acc:
                     best_acc = val_acc
                     best_step = step_idx
-                    print('Saving best model, acc: {:.4f}%\n'.format(best_acc))
+                    print('Saving best model, acc: {:.4f}%'.format(best_acc))
                     save_model(model, './', best_acc, step_idx)
                 else:
                     if step_idx - best_step >= args['early_stopping']:
@@ -61,10 +65,12 @@ def eval_model(data_iter, model):
     size = len(data_iter.dataset)
     avg_loss /= size
     accuracy = 100.0 * corrects / size
-    print('\nEvaluation - loss: {:.6f}  acc: {:.4f}%({}/{}) \n'.format(avg_loss,
-                                                                       accuracy,
-                                                                       corrects,
-                                                                       size))
+    print('Evaluation - loss: {:.6f}  acc: {:.4f}%({}/{})'.format(
+        avg_loss,
+        accuracy,
+        corrects,
+        size)
+    )
     return accuracy
 
 
@@ -76,7 +82,7 @@ def save_vocab(vocab, fname):
 def save_model(model, save_dir, acc, step):
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
-    save_path = '{0}/step{1}_acc{2:.4f}.pt'.format(save_dir, step, acc)
+    save_path = '{0}/model.pt'.format(save_dir, step, acc)
     torch.save(model.state_dict(), save_path)
 
 
@@ -94,9 +100,15 @@ def main():
         kernel_sizes=args['kernel_sizes'],
         dropout_rate=args['dropout_rate']
     )
+    print()
     print(model)
+    print()
 
     train_model(train_iter=train_iter, val_iter=val_iter, model=model, args=args)
+
+    print('\n\nTest with best model')
+    model.load_state_dict(torch.load('./model.pt'))
+    eval_model(data_iter=test_iter, model=model)
 
 
 if __name__ == '__main__':

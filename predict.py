@@ -43,7 +43,7 @@ def to_tensor(sentence, tokenizer, vocab):
 
 
 def main():
-    model, vocab = load_model('./step300_acc90.8000.pt', './vocab.pkl', './conf/textcnn_conf.json')
+    model, vocab = load_model('./model.pt', './vocab.pkl', './conf/textcnn_conf.json')
     model.eval()
 
     tokenizer = Tokenizer().tokenize
@@ -59,7 +59,7 @@ def main():
     for sent in sentences:
         t = to_tensor(sent, tokenizer, vocab)
         pred_class = torch.argmax(model(t).squeeze(0)).item()
-        print(u'{0}\t预测类别:{1}'.format(sent, class_name[pred_class]))
+        print(u'{0:50} 预测类别:{1}'.format(sent, class_name[pred_class]))
 
 
 if __name__ == '__main__':
