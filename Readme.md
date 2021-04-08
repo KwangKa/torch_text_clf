@@ -58,6 +58,9 @@ $ python train.py --model_name textcnn
 
 # TextRNN
 $ python train.py --model_name textrnn
+
+# Transformer Encoder(基于torch.nn实现，简化positional encoding以及输入mask)
+$ python train.py --model_name transformer
 ```
 
 #### 预测
