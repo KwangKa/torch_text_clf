@@ -1,0 +1,9 @@
+{
+  "class_num": 3,
+  "embed_size": 128,
+  "max_seq_length": 100,
+  "nhead": 4,
+  "num_layers": 1,
+  "dim_feedforward": 256,
+  "dropout_rate": 0.1
+}

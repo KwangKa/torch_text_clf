@@ -7,6 +7,7 @@ import pickle
 import torch
 from model.textcnn import TextCNN
 from model.textrnn import TextRNN
+from model.transformer import TransformerClf
 from utils.tokenizer import Tokenizer
 
 
@@ -42,6 +43,17 @@ def load_model(f_model, f_vocab, f_conf, model_name):
             bidirectional=args["bidirectional"],
             dropout_rate=args["dropout_rate"]
         )
+    elif model_name == "transformer":
+        model = TransformerClf(
+            vocab_size=vocab_size,
+            class_num=args['class_num'],
+            max_seq_length=args['max_seq_length'],
+            embed_size=args['embed_size'],
+            nhead=args['nhead'],
+            num_layers=args['num_layers'],
+            dim_feedforward=args['dim_feedforward'],
+            dropout_rate=args['dropout_rate']
+        )
     else:
         raise Exception("Invalid model name:{0}".format(model_name))
     model.load_state_dict(torch.load(f_model))
@@ -57,11 +69,12 @@ def to_tensor(sentence, tokenizer, vocab):
 
 
 def main():
-    model_name = "textrnn"
+    model_name = "transformer"
     f_model = "./output_models/model.pt"
     f_vocab = "./output_models/vocab.pkl"
     f_conf = "./conf/{0}_conf.json".format(model_name)
     model, vocab = load_model(f_model, f_vocab, f_conf, model_name)
+    # print(model)
     model.eval()
 
     tokenizer = Tokenizer().tokenize

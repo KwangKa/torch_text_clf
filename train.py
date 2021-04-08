@@ -11,6 +11,7 @@ import torch
 import torch.nn.functional as F
 from model.textcnn import TextCNN
 from model.textrnn import TextRNN
+from model.transformer import TransformerClf
 import dataset
 
 
@@ -71,7 +72,8 @@ def train_model(train_iter, val_iter, model, args):
                     save_model(model, args.output_model_path)
                 else:
                     if step_idx - best_step >= args.early_stopping:
-                        raise Exception('early stop by {} steps, acc: {:.4f}%'.format(args.early_stopping, best_acc))
+                        print('early stop by {} steps, acc: {:.4f}%'.format(args.early_stopping, best_acc))
+                        return
 
 
 def eval_model(data_iter, model):
@@ -135,6 +137,17 @@ def build_model(args, model_conf, vocab_size):
             bidirectional=model_conf['bidirectional'],
             dropout_rate=model_conf['dropout_rate']
         )
+    elif args.model_name == "transformer":
+        model = TransformerClf(
+            vocab_size=vocab_size,
+            class_num=model_conf['class_num'],
+            max_seq_length=model_conf['max_seq_length'],
+            embed_size=model_conf['embed_size'],
+            nhead=model_conf['nhead'],
+            num_layers=model_conf['num_layers'],
+            dim_feedforward=model_conf['dim_feedforward'],
+            dropout_rate=model_conf['dropout_rate']
+        )
     else:
         raise Exception("Invalid model name:{0}".format(args.model_name))
     return model
@@ -142,7 +155,7 @@ def build_model(args, model_conf, vocab_size):
 
 def main():
     args = parse_args()
-    if args.model_name not in ["textcnn", "textrnn"]:
+    if args.model_name not in ["textcnn", "textrnn", "transformer"]:
         raise Exception("Invalid model name:{0}".format(args.model_name))
 
     train_iter, val_iter, test_iter, vocab = dataset.get_data(args)
@@ -150,6 +163,9 @@ def main():
     vocab_size = len(vocab)
 
     model_conf = load_model_conf(args)
+    if "max_seq_length" in model_conf and model_conf["max_seq_length"] != args.max_seq_length:
+        raise Exception("Data padding max length != model max seq length")
+
     model = build_model(args, model_conf, vocab_size)
     print("===== model structure:")
     print(model)

@@ -9,15 +9,15 @@
 ### 1. 已实现模型
 - [x] TextCNN
 - [x] TextRNN
-- [ ] HAN
+- [x] Transformer Encoder
 
 ---
 
 ### 2. 用法
 
-使用参数
+#### 使用参数
 
-```python
+```
 $ python train.py -h
 usage: train.py [-h] [--model_name MODEL_NAME]
                 [--output_model_path OUTPUT_MODEL_PATH]
@@ -51,7 +51,7 @@ optional arguments:
                         Validation interval. (default: 30)
 ```
 
-训练
+#### 训练
 ```bash
 # TextCNN(default)
 $ python train.py --model_name textcnn
@@ -60,12 +60,7 @@ $ python train.py --model_name textcnn
 $ python train.py --model_name textrnn
 ```
 
-| model_name | accuracy |
-| --- | --- |
-| TextCNN | 89.8% |
-| TextRNN | 89.7% |
-
-预测
+#### 预测
 ```bash
 # 按需修改模型名称和相关模型文件路径
 $ python predict.py
@@ -78,6 +73,21 @@ $ python predict.py
 刘涛：出席活动！网友：我只看到她的一条腿！                             预测类别:entertainment
 忘尽心中情，刘德华版《苏乞儿》的主题曲，老歌经典豪气                     预测类别:entertainment
 ```
+
+#### 数据集
+来源于[中文文本分类数据集THUCNews](http://thuctc.thunlp.org/#%E4%B8%AD%E6%96%87%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E6%95%B0%E6%8D%AE%E9%9B%86THUCNews)，选了体育、娱乐、金融三类数据的新闻标题。
+
+| 数据集划分 | 总样本量 | 娱乐 | 体育 | 金融 |
+| :---: | :---: | :---: | :---: | :---: |
+| 训练集 | 8000 | 2993 | 2903 | 2104 |
+| 验证集 | 1000 | 379 | 332 | 289 |
+| 测试集 | 1000 | 375 | 354 | 271 |
+
+| model_name | accuracy |
+| --- | --- |
+| TextCNN | ~88.3% |
+| TextRNN | ~88.8% |
+| Transformer | ~89.0% |
 
 ---
 
