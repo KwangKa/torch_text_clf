@@ -1,0 +1,8 @@
+{
+  "class_num": 3,
+  "embed_size": 128,
+  "hidden_size": 128,
+  "num_layers": 1,
+  "bidirectional": true,
+  "dropout_rate": 0.5
+}

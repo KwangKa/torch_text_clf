@@ -51,8 +51,8 @@ class ClfPadCollator(object):
         return ids, labels
 
 
-def get_data(path, batch_size):
-    path = Path(path)
+def get_data(args):
+    path = Path(args.data_path)
     f_train = path / 'train.json'
     f_test = path / 'test.json'
     f_val = path / 'val.json'
@@ -64,8 +64,8 @@ def get_data(path, batch_size):
     test_ds = ClassificationDataset(fname=f_test, tokenizer=tokenizer.tokenize, vocab=vocab)
     val_ds = ClassificationDataset(fname=f_val, tokenizer=tokenizer.tokenize, vocab=vocab)
 
-    collator = ClfPadCollator(max_len=32)
-    train_iter = DataLoader(train_ds, batch_size=batch_size, shuffle=True, collate_fn=collator.collate)
-    test_iter = DataLoader(test_ds, batch_size=batch_size, shuffle=False, collate_fn=collator.collate)
-    val_iter = DataLoader(val_ds, batch_size=batch_size, shuffle=False, collate_fn=collator.collate)
+    collator = ClfPadCollator(args.max_seq_length)
+    train_iter = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collator.collate)
+    test_iter = DataLoader(test_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collator.collate)
+    val_iter = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collator.collate)
     return train_iter, val_iter, test_iter, vocab

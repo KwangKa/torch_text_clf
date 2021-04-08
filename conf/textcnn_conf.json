@@ -3,11 +3,5 @@
   "embed_size": 128,
   "kernel_num": 100,
   "kernel_sizes": [2, 3, 4],
-  "dropout_rate": 0.5,
-  "batch_size": 128,
-  "lr": 0.01,
-  "epochs": 3,
-  "early_stopping": 100,
-  "display_interval": 1,
-  "val_interval": 30
+  "dropout_rate": 0.5
 }

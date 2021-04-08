@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/torch-1.7.1-green)
 
 <h3 align="center">
-<p>A PyTorch implementation of neural classififers for Chinese
+<p>A PyTorch implementation of neural classififers for Chinese</p>
 </h3>
 
 ### 1. 已实现模型

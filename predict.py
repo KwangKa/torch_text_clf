@@ -6,6 +6,7 @@ import json
 import pickle
 import torch
 from model.textcnn import TextCNN
+from model.textrnn import TextRNN
 from utils.tokenizer import Tokenizer
 
 
@@ -15,21 +16,34 @@ def load_vocab(fname):
     return vocab
 
 
-def load_model(f_model, f_vocab, f_conf):
+def load_model(f_model, f_vocab, f_conf, model_name):
     with open(f_conf, 'r') as h_in:
         args = json.load(h_in)
 
     vocab = load_vocab(f_vocab)
     vocab_size = len(vocab)
 
-    model = TextCNN(
-        vocab_size=vocab_size,
-        class_num=args['class_num'],
-        embed_size=args['embed_size'],
-        kernel_num=args['kernel_num'],
-        kernel_sizes=args['kernel_sizes'],
-        dropout_rate=args['dropout_rate']
-    )
+    if model_name == "textcnn":
+        model = TextCNN(
+            vocab_size=vocab_size,
+            class_num=args['class_num'],
+            embed_size=args['embed_size'],
+            kernel_num=args['kernel_num'],
+            kernel_sizes=args['kernel_sizes'],
+            dropout_rate=args['dropout_rate']
+        )
+    elif model_name == "textrnn":
+        model = TextRNN(
+            vocab_size=vocab_size,
+            class_num=args["class_num"],
+            embed_size=args["embed_size"],
+            hidden_size=args["hidden_size"],
+            num_layers=args["num_layers"],
+            bidirectional=args["bidirectional"],
+            dropout_rate=args["dropout_rate"]
+        )
+    else:
+        raise Exception("Invalid model name:{0}".format(model_name))
     model.load_state_dict(torch.load(f_model))
     return model, vocab
 
@@ -43,7 +57,11 @@ def to_tensor(sentence, tokenizer, vocab):
 
 
 def main():
-    model, vocab = load_model('./model.pt', './vocab.pkl', './conf/textcnn_conf.json')
+    model_name = "textrnn"
+    f_model = "./output_models/model.pt"
+    f_vocab = "./output_models/vocab.pkl"
+    f_conf = "./conf/{0}_conf.json".format(model_name)
+    model, vocab = load_model(f_model, f_vocab, f_conf, model_name)
     model.eval()
 
     tokenizer = Tokenizer().tokenize
